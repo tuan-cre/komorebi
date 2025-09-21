@@ -6,6 +6,7 @@ use crossbeam_utils::atomic::AtomicConsume;
 use parking_lot::Mutex;
 use std::sync::atomic::AtomicBool;
 use std::sync::atomic::AtomicU8;
+use std::sync::atomic::Ordering;
 use std::sync::Arc;
 use std::sync::OnceLock;
 
@@ -18,6 +19,7 @@ use crate::TRANSPARENCY_BLACKLIST;
 
 pub static TRANSPARENCY_ENABLED: AtomicBool = AtomicBool::new(false);
 pub static TRANSPARENCY_ALPHA: AtomicU8 = AtomicU8::new(200);
+pub static FOCUSED_TRANSPARENCY_ALPHA: AtomicU8 = AtomicU8::new(255);
 
 static KNOWN_HWNDS: OnceLock<Mutex<Vec<isize>>> = OnceLock::new();
 
@@ -103,21 +105,28 @@ pub fn handle_notifications(wm: Arc<Mutex<WindowManager>>) -> color_eyre::Result
                     continue 'workspaces;
                 }
 
-                // Monocle container is never transparent
+                // Monocle container focused windows should get focused transparency
                 if let Some(monocle) = &ws.monocle_container {
                     if let Some(window) = monocle.focused_window() {
                         if monitor_idx == focused_monitor_idx {
-                            if let Err(error) = window.opaque() {
+                            // Apply focused transparency to monocle window on focused monitor
+                            if let Err(error) = window.set_alpha(
+                                FOCUSED_TRANSPARENCY_ALPHA.load(Ordering::Relaxed)
+                            ) {
                                 let hwnd = window.hwnd;
                                 tracing::error!(
-                                    "failed to make monocle window {hwnd} opaque: {error}"
+                                    "failed to set transparency for focused monocle window {hwnd}: {error}"
                                 )
+                            } else {
+                                known_hwnds.lock().push(window.hwnd);
                             }
                         } else if let Err(error) = window.transparent() {
                             let hwnd = window.hwnd;
                             tracing::error!(
-                                "failed to make monocle window {hwnd} transparent: {error}"
+                                "failed to make unfocused monocle window {hwnd} transparent: {error}"
                             )
+                        } else {
+                            known_hwnds.lock().push(window.hwnd);
                         }
                     }
 
@@ -127,14 +136,22 @@ pub fn handle_notifications(wm: Arc<Mutex<WindowManager>>) -> color_eyre::Result
                 let foreground_hwnd = WindowsApi::foreground_window().unwrap_or_default();
                 let is_maximized = WindowsApi::is_zoomed(foreground_hwnd);
 
-                if is_maximized {
-                    if let Err(error) = Window::from(foreground_hwnd).opaque() {
+                // Handle maximized windows separately
+                if is_maximized && monitor_idx == focused_monitor_idx {
+                    if let Err(error) = Window::from(foreground_hwnd)
+                        .set_alpha(FOCUSED_TRANSPARENCY_ALPHA.load(Ordering::Relaxed)) {
                         let hwnd = foreground_hwnd;
-                        tracing::error!("failed to make maximized window {hwnd} opaque: {error}")
+                        tracing::error!(
+                            "failed to set transparency for maximized focused window {hwnd}: {error}"
+                        )
+                    } else {
+                        // Add to known windows for proper cleanup
+                        known_hwnds.lock().push(foreground_hwnd);
                     }
 
                     continue 'monitors;
                 }
+
 
                 let transparency_blacklist = TRANSPARENCY_BLACKLIST.lock();
                 let regex_identifiers = REGEX_IDENTIFIERS.lock();
@@ -188,24 +205,54 @@ pub fn handle_notifications(wm: Arc<Mutex<WindowManager>>) -> color_eyre::Result
                                 known_hwnds.lock().push(window.hwnd);
                             }
                         }
-                    // Otherwise, make it opaque
+                    // Otherwise, make it opaque or apply focused transparency
                     } else {
                         let focused_window_idx = c.focused_window_idx();
                         for (window_idx, window) in c.windows().iter().enumerate() {
                             if window_idx != focused_window_idx {
+                                // Non-focused windows in focused container should be opaque
+                                if let Err(error) = window.opaque() {
+                                    let hwnd = window.hwnd;
+                                    tracing::error!("failed to make non-focused window {hwnd} opaque: {error}")
+                                }
                                 known_hwnds.lock().push(window.hwnd);
                             } else {
-                                if let Err(error) =
-                                    c.focused_window().copied().unwrap_or_default().opaque()
-                                {
-                                    let hwnd = foreground_hwnd;
+                                // Apply focused transparency to the focused window
+                                if let Err(error) = window.set_alpha(
+                                    FOCUSED_TRANSPARENCY_ALPHA.load(Ordering::Relaxed)
+                                ) {
+                                    let hwnd = window.hwnd;
                                     tracing::error!(
-                                        "failed to make focused window {hwnd} opaque: {error}"
+                                        "failed to set focused window transparency {hwnd}: {error}"
                                     )
                                 }
+                                known_hwnds.lock().push(window.hwnd);
                             }
                         }
-                    };
+                    }
+
+                }
+
+                // Handle floating windows
+                for window in ws.floating_windows() {
+                    if window.hwnd == foreground_hwnd && monitor_idx == focused_monitor_idx {
+                        // Apply focused transparency to focused floating window
+                        if let Err(error) = window.set_alpha(
+                            FOCUSED_TRANSPARENCY_ALPHA.load(Ordering::Relaxed)
+                        ) {
+                            let hwnd = window.hwnd;
+                            tracing::error!(
+                                "failed to set focused floating window transparency {hwnd}: {error}"
+                            )
+                        }
+                    } else {
+                        // Make unfocused floating windows transparent
+                        if let Err(error) = window.transparent() {
+                            let hwnd = window.hwnd;
+                            tracing::error!("failed to make unfocused floating window {hwnd} transparent: {error}")
+                        }
+                    }
+                    known_hwnds.lock().push(window.hwnd);
                 }
             }
         }

@@ -7860,6 +7860,26 @@
                       ],
                       "properties": {
                         "content": {
+                          "type": "integer",
+                          "format": "uint8",
+                          "minimum": 0.0
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "FocusedTransparencyAlpha"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "content",
+                        "type"
+                      ],
+                      "properties": {
+                        "content": {
                           "type": "object",
                           "required": [
                             "bottom",
@@ -13989,6 +14009,26 @@
                           "type": "string",
                           "enum": [
                             "TransparencyAlpha"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "content",
+                        "type"
+                      ],
+                      "properties": {
+                        "content": {
+                          "type": "integer",
+                          "format": "uint8",
+                          "minimum": 0.0
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "FocusedTransparencyAlpha"
                           ]
                         }
                       }
@@ -20142,6 +20182,26 @@
                       ],
                       "properties": {
                         "content": {
+                          "type": "integer",
+                          "format": "uint8",
+                          "minimum": 0.0
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "FocusedTransparencyAlpha"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "content",
+                        "type"
+                      ],
+                      "properties": {
+                        "content": {
                           "type": "object",
                           "required": [
                             "bottom",
@@ -26271,6 +26331,26 @@
                           "type": "string",
                           "enum": [
                             "TransparencyAlpha"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "content",
+                        "type"
+                      ],
+                      "properties": {
+                        "content": {
+                          "type": "integer",
+                          "format": "uint8",
+                          "minimum": 0.0
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "FocusedTransparencyAlpha"
                           ]
                         }
                       }
@@ -32424,6 +32504,26 @@
                       ],
                       "properties": {
                         "content": {
+                          "type": "integer",
+                          "format": "uint8",
+                          "minimum": 0.0
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "FocusedTransparencyAlpha"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "content",
+                        "type"
+                      ],
+                      "properties": {
+                        "content": {
                           "type": "object",
                           "required": [
                             "bottom",
@@ -38553,6 +38653,26 @@
                           "type": "string",
                           "enum": [
                             "TransparencyAlpha"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "content",
+                        "type"
+                      ],
+                      "properties": {
+                        "content": {
+                          "type": "integer",
+                          "format": "uint8",
+                          "minimum": 0.0
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "FocusedTransparencyAlpha"
                           ]
                         }
                       }
@@ -44706,6 +44826,26 @@
                       ],
                       "properties": {
                         "content": {
+                          "type": "integer",
+                          "format": "uint8",
+                          "minimum": 0.0
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "FocusedTransparencyAlpha"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "content",
+                        "type"
+                      ],
+                      "properties": {
+                        "content": {
                           "type": "object",
                           "required": [
                             "bottom",
@@ -50847,6 +50987,26 @@
                       ],
                       "properties": {
                         "content": {
+                          "type": "integer",
+                          "format": "uint8",
+                          "minimum": 0.0
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "FocusedTransparencyAlpha"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "content",
+                        "type"
+                      ],
+                      "properties": {
+                        "content": {
                           "type": "object",
                           "required": [
                             "bottom",
@@ -56976,6 +57136,26 @@
                           "type": "string",
                           "enum": [
                             "TransparencyAlpha"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "required": [
+                        "content",
+                        "type"
+                      ],
+                      "properties": {
+                        "content": {
+                          "type": "integer",
+                          "format": "uint8",
+                          "minimum": 0.0
+                        },
+                        "type": {
+                          "type": "string",
+                          "enum": [
+                            "FocusedTransparencyAlpha"
                           ]
                         }
                       }

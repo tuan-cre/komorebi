@@ -704,6 +704,12 @@ struct TransparencyAlpha {
 }
 
 #[derive(Parser)]
+struct FocusedTransparencyAlpha {
+    /// Alpha
+    alpha: u8,
+}
+
+#[derive(Parser)]
 struct BorderColour {
     #[clap(value_enum, short, long, default_value = "single")]
     window_kind: WindowKind,
@@ -1454,6 +1460,9 @@ enum SubCommand {
     /// Set the alpha value for unfocused window transparency
     #[clap(arg_required_else_help = true)]
     TransparencyAlpha(TransparencyAlpha),
+    /// Set the alpha value for focused window transparency
+    #[clap(arg_required_else_help = true)]
+    FocusedTransparencyAlpha(FocusedTransparencyAlpha),
     /// Toggle transparency for unfocused windows
     ToggleTransparency,
     /// Enable or disable movement animations
@@ -2953,6 +2962,9 @@ if (Get-Command Get-CimInstance -ErrorAction SilentlyContinue) {
         }
         SubCommand::TransparencyAlpha(arg) => {
             send_message(&SocketMessage::TransparencyAlpha(arg.alpha))?;
+        }
+        SubCommand::FocusedTransparencyAlpha(arg) => {
+            send_message(&SocketMessage::FocusedTransparencyAlpha(arg.alpha))?;
         }
         SubCommand::ToggleTransparency => {
             send_message(&SocketMessage::ToggleTransparency)?;

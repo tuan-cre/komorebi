@@ -502,6 +502,9 @@ pub struct StaticConfig {
     /// Alpha value for unfocused window transparency [[0-255]] (default: 200)
     #[serde(skip_serializing_if = "Option::is_none")]
     pub transparency_alpha: Option<u8>,
+    /// Alpha value for focused window transparency [[0-255]] (default: 255)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub focused_transparency_alpha: Option<u8>,
     /// Individual window transparency ignore rules
     #[serde(skip_serializing_if = "Option::is_none")]
     pub transparency_ignore_rules: Option<Vec<MatchingRule>>,
@@ -899,6 +902,9 @@ impl From<&WindowManager> for StaticConfig {
             transparency_alpha: Option::from(
                 transparency_manager::TRANSPARENCY_ALPHA.load(Ordering::SeqCst),
             ),
+            focused_transparency_alpha: Option::from(
+                transparency_manager::FOCUSED_TRANSPARENCY_ALPHA.load(Ordering::SeqCst),
+            ),
             transparency_ignore_rules: None,
             border_style: Option::from(STYLE.load()),
             border_z_order: None,
@@ -1084,6 +1090,8 @@ impl StaticConfig {
             .store(self.transparency.unwrap_or(false), Ordering::SeqCst);
         transparency_manager::TRANSPARENCY_ALPHA
             .store(self.transparency_alpha.unwrap_or(200), Ordering::SeqCst);
+        transparency_manager::FOCUSED_TRANSPARENCY_ALPHA
+            .store(self.focused_transparency_alpha.unwrap_or(255), Ordering::SeqCst);
 
         let mut ignore_identifiers = IGNORE_IDENTIFIERS.lock();
         let mut regex_identifiers = REGEX_IDENTIFIERS.lock();

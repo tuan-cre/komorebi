@@ -190,6 +190,7 @@ pub enum SocketMessage {
     Transparency(bool),
     ToggleTransparency,
     TransparencyAlpha(u8),
+    FocusedTransparencyAlpha(u8),
     InvisibleBorders(Rect),
     StackbarMode(StackbarMode),
     StackbarLabel(StackbarLabel),

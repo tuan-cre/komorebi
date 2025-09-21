@@ -4470,6 +4470,12 @@
       "format": "uint8",
       "minimum": 0.0
     },
+    "focused_transparency_alpha": {
+      "description": "Alpha value for focused window transparency [[0-255]] (default: 255)",
+      "type": "integer",
+      "format": "uint8",
+      "minimum": 0.0
+    },
     "transparency_ignore_rules": {
       "description": "Individual window transparency ignore rules",
       "type": "array",

@@ -2158,6 +2158,9 @@ if (!(Get-Process komorebi-bar -ErrorAction SilentlyContinue))
             SocketMessage::TransparencyAlpha(alpha) => {
                 transparency_manager::TRANSPARENCY_ALPHA.store(alpha, Ordering::SeqCst);
             }
+            SocketMessage::FocusedTransparencyAlpha(alpha) => {
+                transparency_manager::FOCUSED_TRANSPARENCY_ALPHA.store(alpha, Ordering::SeqCst);
+            }
             SocketMessage::StackbarMode(mode) => {
                 STACKBAR_MODE.store(mode);
                 self.retile_all(true)?;
