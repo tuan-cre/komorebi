@@ -666,6 +666,47 @@ impl Window {
         }
     }
 
+    pub fn set_alpha(self, alpha: u8) -> Result<()> {
+        let animation_enabled = ANIMATION_ENABLED_PER_ANIMATION.lock();
+        let transparent_enabled = animation_enabled.get(&TransparencyRenderDispatcher::PREFIX);
+
+        if transparent_enabled.is_some_and(|enabled| *enabled)
+            || ANIMATION_ENABLED_GLOBAL.load(Ordering::SeqCst)
+        {
+            let duration = Duration::from_millis(
+                *ANIMATION_DURATION_PER_ANIMATION
+                    .lock()
+                    .get(&TransparencyRenderDispatcher::PREFIX)
+                    .unwrap_or(&ANIMATION_DURATION_GLOBAL.load(Ordering::SeqCst)),
+            );
+            let style = *ANIMATION_STYLE_PER_ANIMATION
+                .lock()
+                .get(&TransparencyRenderDispatcher::PREFIX)
+                .unwrap_or(&ANIMATION_STYLE_GLOBAL.lock());
+
+            let current_alpha = WindowsApi::get_transparent(self.hwnd).unwrap_or(255);
+
+            let render_dispatcher = TransparencyRenderDispatcher::new(
+                self.hwnd,
+                alpha == 255,
+                current_alpha,
+                alpha,
+                style,
+            );
+
+            AnimationEngine::animate(render_dispatcher, duration)
+        } else {
+            let mut ex_style = self.ex_style()?;
+            if alpha < 255 {
+                ex_style.insert(ExtendedWindowStyle::LAYERED);
+            } else {
+                ex_style.remove(ExtendedWindowStyle::LAYERED);
+            }
+            self.update_ex_style(&ex_style)?;
+            WindowsApi::set_transparent(self.hwnd, alpha)
+        }
+    }
+
     pub fn set_accent(self, colour: u32) -> Result<()> {
         WindowsApi::set_window_accent(self.hwnd, Some(colour))
     }
